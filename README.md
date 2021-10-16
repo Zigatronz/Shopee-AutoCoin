@@ -2,7 +2,7 @@
 Let Shopee AutoCoin run at background and notify you when to collect **Shopee Coins Rewards**. With pressing only **one button**, Shopee AutoCoin will collect Shopee Coins Rewards **automatically** for you.
 ## How To Install
 1. Download the installer [**here**](https://github.com/Zigatronz/Shopee-AutoCoin/releases)
-2. Run **Shopee AutoCoin Installer.exe**.
+2. Run **ShopeeAutoCoin_Installer.exe**.
 3. Select location to extract.
 4. Run **Shopee AutoCoin.exe** at the extracted location.
 5. And now you're ready to go.
