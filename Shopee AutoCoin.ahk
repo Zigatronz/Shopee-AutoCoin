@@ -6,7 +6,8 @@ WinTitle := "Shopee AutoCoin"						; windows title
 if (!FileExist("Data\User"))
 	DirCreate "Data\User"
 ConfigFile := A_ScriptDir . "\Data\User\config.ini"	; Config file path
-TraySetIcon("Data\Icon\shopeecoin.ico")
+if (FileExist("Data\Icon\shopeecoin.ico"))
+	TraySetIcon("Data\Icon\shopeecoin.ico")
 ; Some GUI config
 AccentColor := "FF8000"
 FGColor := "FFFFFF"
@@ -147,6 +148,14 @@ AskForUserConformation(){
 
 RunCollectCoin(){
 	global
+	if (!FileExist("Data\Lib\CollectCoin Firefox via QR.exe")){
+		if (MsgBox("Seems like one of the most important file is missing:`n" . A_ScriptDir . "\Data\Lib\CollectCoin Firefox via QR.exe`nIf this is unexpected error, this might comes from your antivirus detecting false positive virus. Please exclude this file and reinstall this software.`n`nDo you wish to download the installer? This will open up your browser.", WinTitle, "20") == "Yes"){
+			Run("https://github.com/Zigatronz/Shopee-AutoCoin/releases")
+			ExitApp
+		}Else{
+			ExitApp
+		}
+	}
 	if(A_IsCompiled){
 		Run("Data\Lib\CollectCoin Firefox via QR.exe", A_ScriptDir, "Hide", &PythonPID)
 	}Else{
@@ -269,5 +278,5 @@ ExitProgram(*){
 	ExitApp
 }
 
-#Include Data\Lib\Func.ahk2
-#Include Data\Lib\GUI.ahk2
+#Include Data\Lib\Func.ahk
+#Include Data\Lib\GUI.ahk

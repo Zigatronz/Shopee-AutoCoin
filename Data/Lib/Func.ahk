@@ -1,8 +1,13 @@
 
 GetCurrentVersion(){
 	local VerText:=""
-	VerText := FileRead("Data\Version.txt")
-	Return Float(SubStr(VerText, InStr(VerText, Chr(34)) + 1, (InStr(VerText, Chr(34), False, InStr(VerText, Chr(34)) + 1)) - (InStr(VerText, Chr(34)) + 1)))
+	try VerText := FileRead("Data\Version.txt")
+	Catch
+	{
+		Return 0
+	}Else{
+		Return Float(SubStr(VerText, InStr(VerText, Chr(34)) + 1, (InStr(VerText, Chr(34), False, InStr(VerText, Chr(34)) + 1)) - (InStr(VerText, Chr(34)) + 1)))
+	}
 }
 
 CheckUpdateVersion(){
@@ -48,8 +53,16 @@ GetPythonProgress(&ProgressName, &Percentage){
 }
 
 WinGetPos_(WinTitle){
-    WinGetPos(&TaskBarX, &TaskBarY, &TaskBarW, &TaskBarH, WinTitle)
-	Return [TaskBarX, TaskBarY, TaskBarW, TaskBarH]
+	local TaskBarX:=0, TaskBarY:=0, TaskBarW:=0, TaskBarH:=0
+	try WinGetPos(&TaskBarX, &TaskBarY, &TaskBarW, &TaskBarH, WinTitle)
+	Catch
+	{
+		Return [0, 0, 0, 0]
+	}
+	Else
+	{
+		Return [TaskBarX, TaskBarY, TaskBarW, TaskBarH]
+	}
 }
 
 WriteLastCheck(WriteEmpty:=False){
