@@ -11,15 +11,36 @@ GetCurrentVersion(){
 }
 
 CheckUpdateVersion(){
-	local ReceivedHTML, TextPosition:=0, TextStart:=0, TextEnd:=0
-	RunWait(A_ComSpec . " /c curl https://github.com/Zigatronz/Shopee-AutoCoin/blob/master/Data/Version.txt > " . Chr(34) . "Data\updatecache.dat" . Chr(34), A_ScriptDir, "Hide")
-	ReceivedHTML := FileRead("Data\updatecache.dat")
-	FileDelete "Data\updatecache.dat"
-	TextPosition := InStr(ReceivedHTML, "SoftwareVersion=", False)
-	if (TextPosition != 0){
-		TextStart := InStr(ReceivedHTML, "&quot;", False, TextPosition) + 6
-		TextEnd := InStr(ReceivedHTML, "&quot;", False, TextStart)
-		Return Float(SubStr(ReceivedHTML, TextStart, TextEnd - TextStart))
+	local ReceivedHTML, TextPosition:=0, TextStart:=0, TextEnd:=0, CurlPID:=0, CurlTime:=0
+	if (!FileExist("C:\Windows\System32\curl.exe")){
+		MsgBox("curl.exe is missing on your Windows! Without this, Shopee AutoCoin can't check for the latest update.")
+	}Else{
+		Run("C:\Windows\System32\curl.exe https://github.com/Zigatronz/Shopee-AutoCoin/blob/master/Data/Version.txt -o " . Chr(34) . "Data\updatecache.dat" . Chr(34), A_ScriptDir, "Hide", &CurlPID)
+		; not responding curl handler
+		Loop
+		{
+			if (!ProcessExist(CurlPID)){
+				Break
+			}Else{
+				Sleep(1000)
+				CurlTime += 1
+				if (CurlTime > 5){
+					ProcessClose(CurlPID)
+					sleep(500)
+					Break
+				}
+			}
+		}
+		if (FileExist("Data\updatecache.dat")){
+			ReceivedHTML := FileRead("Data\updatecache.dat")
+			FileDelete "Data\updatecache.dat"
+			TextPosition := InStr(ReceivedHTML, "SoftwareVersion=", False)
+			if (TextPosition != 0){
+				TextStart := InStr(ReceivedHTML, "&quot;", False, TextPosition) + 6
+				TextEnd := InStr(ReceivedHTML, "&quot;", False, TextStart)
+				Return Float(SubStr(ReceivedHTML, TextStart, TextEnd - TextStart))
+			}
+		}
 	}
 	Return 0
 }
@@ -32,7 +53,11 @@ GetPythonProgress(&ProgressName, &Percentage){
 		Percentage := 0
 	PythonRespond := [
 		"Initializing...",
+		"Starting up Firefox...",
+		"Firefox ready",
 		"Loading cookies...",
+		"Cookies Loaded",
+		"No internet. Retrying...",
 		"Loading webpage...",
 		"Processing login",
 		"Loading QRCode...",
@@ -41,6 +66,7 @@ GetPythonProgress(&ProgressName, &Percentage){
 		"Login Complete",
 		"Collecting coin...",
 		"Coin collected",
+		"Saving cookies...",
 		"Settled"
 	]
 	for i,c in PythonRespond
