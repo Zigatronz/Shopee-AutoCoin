@@ -1,6 +1,10 @@
+
+;		PS : This is AHK v2 script
+
 ; allow only one running
 #SingleInstance Ignore
 Persistent
+DetectHiddenWindows True
 SetWorkingDir(A_ScriptDir)
 WinTitle := "Shopee AutoCoin"						; windows title
 if (!FileExist("Data\User"))
@@ -139,10 +143,12 @@ Main(){
 
 AskForUserConformation(){
 	global
-	if (IniRead_(ConfigFile, "UserData", "lastcheck") == "Error"){
-		ReminderGUI_Show("Never", 0)
-	}Else{
-		ReminderGUI_Show(DateToHumanReadable(IniRead_(ConfigFile, "UserData", "lastcheck")), IniRead_(ConfigFile, "UserData", "coinearned"))
+	if (CheckUpdateVersion() > 0){
+		if (IniRead_(ConfigFile, "UserData", "lastcheck") == "Error"){
+			ReminderGUI_Show("Never", 0)
+		}Else{
+			ReminderGUI_Show(DateToHumanReadable(IniRead_(ConfigFile, "UserData", "lastcheck")), IniRead_(ConfigFile, "UserData", "coinearned"))
+		}
 	}
 }
 
@@ -156,12 +162,10 @@ RunCollectCoin(){
 			ExitApp
 		}
 	}
-	if(A_IsCompiled){
+	if (A_IsCompiled)
 		Run("Data\Lib\CollectCoin Firefox via QR.exe", A_ScriptDir, "Hide", &PythonPID)
-	}Else{
-		; For debugging
-		Run("Data\Lib\CollectCoin Firefox via QR.py", A_ScriptDir, "", &PythonPID)
-	}
+	Else
+		Run("Data\Lib\CollectCoin Firefox via QR.exe", A_ScriptDir, "", &PythonPID)
 	ProgressGUI_Show()
 	SetTimer(PythonWatcher, 500)
 }
@@ -183,7 +187,9 @@ PythonWatcher(){
 		ProgressGUI.Destroy()
 		; remove python cache
 		if (FileExist("cache"))
-			DirDelete "cache", 1
+			if (!FileExist("cache\done"))
+				DirDelete("cache", 1)
+		SetTimer(Main, MainInterval)
 	}
 
 	; Show QR code when it's available
@@ -239,16 +245,26 @@ MainGui_Relocate_Cookie(GuiCtrlObj, Info){
 
 MainGui_Submit_CheckNow(GuiCtrlObj, Info){
 	global
+	; avoid user's repetitive clicks
+	MainGui.Hide()
 	MainGui_is_showing := False
-	RunCollectCoin()
-	SetTimer(Main, MainInterval)
+	if (CheckUpdateVersion() > 0){
+		RunCollectCoin()
+	}Else{
+		MsgBox("Looks like you're not connected to the internet. You might need a stable internet connection for this. Please try again later.", WinTitle, "64 T25")
+		SetTimer(AskForUserConformation, 3600 * -1000)	; run this timer once
+	}
 }
 
 ReminderGUI_Submit_CheckNow(GuiCtrlObj, Info){
 	global
 	ReminderGui.Destroy()
-	RunCollectCoin()
-	SetTimer(Main, MainInterval)
+	if (CheckUpdateVersion() > 0){
+		RunCollectCoin()
+	}Else{
+		MsgBox("Looks like you're not connected to the internet. Please wait a bit till you got a stable internet connection.", WinTitle, "64 T20")
+		SetTimer(AskForUserConformation, 3600 * -1000)	; run this timer once
+	}
 }
 
 ReminderGUI_Submit_Later(GuiCtrlObj, Info){
@@ -261,19 +277,62 @@ ReminderGUI_Submit_NotToday(GuiCtrlObj, Info){
 	global
 	ReminderGui.Destroy()
 	WriteLastCheck()
-	SetTimer(Main, MainInterval)
-	
 }
+
+ProgressGUI_Stop(GuiCtrlObj, Info){
+	ProgressGUI_StopButton.Enabled := False
+	PythonSendForceStop()
+}
+
+PythonSendForceStop(){
+	global
+	if (ProcessExist(PythonPID)){
+		Loop
+		{
+			if (FileExist("cache")){
+				Break
+			}Else{
+				Sleep(250)
+			}
+		}
+    	FileAppend("", "cache\stop")
+		Loop
+		{
+			if (FileExist("cache\done")){
+				ProcessClose(PythonPID)
+				Sleep(250)
+				; End the remaining window
+				WinClose("CollectCoin Firefox via QR ahk_exe geckodriver.exe")
+				DirDelete("cache", 1)
+				Break
+			}Else{
+				Sleep(500)
+			}
+		}
+	}Else{
+		MsgBox("PythonSendForceStop requested but nothing to be done with it. If this is unexpected error, please report it to the developer.", WinTitle, "48")
+	}
+	Return
+}
+
+/*
+C:\Windows\py.exe
+ahk_class ConsoleWindowClass
+ahk_exe geckodriver.exe
+
+Data\Lib\CollectCoin Firefox via QR.exe
+ahk_class ConsoleWindowClass
+ahk_exe CollectCoin Firefox via QR.exe
+
+Data\Lib\CollectCoin Firefox via QR.exe
+ahk_class ConsoleWindowClass
+ahk_exe geckodriver.exe
+*/
 
 ExitProgram(*){
 	global
-	Loop
-	{
-		if (ProcessExist(PythonPID)){
-			Sleep(2500)
-		}Else{
-			Break
-		}
+	if (ProcessExist(PythonPID)){
+		PythonSendForceStop()
 	}
 	ExitApp
 }

@@ -5,14 +5,29 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from threading import Timer
 
 # remove old & create cache folder
 if os.path.exists('cache'):
 	shutil.rmtree('cache')
 os.mkdir("cache")
 os.mkdir(r"cache\\progress")
-
 open(r"cache\\progress\\Initializing...", "x")
+
+# Force exit handler
+StopCheckForForceExit = True
+def CheckForForceExit():
+	global driver, StopCheckForForceExit
+	if os.path.exists(r"cache\\stop"):
+		# close Firefox and kill this script
+		try:
+			driver.close()
+		except:
+			print("Force exit without ending the driver. Firefox will remain at background process!")
+		open(r"cache\\done", "x")
+		os._exit(0)
+	if not StopCheckForForceExit:
+		Timer(0.5, CheckForForceExit).start()
 
 def ConfigParserGet(config, Section, Key):
 	value = ''
@@ -69,10 +84,17 @@ options.add_argument("--headless")
 Capabilities = DesiredCapabilities.FIREFOX
 Capabilities["pageLoadStrategy"] = "eager"
 
+# check for force exit before start Firefox
+CheckForForceExit()
 #   initialize browser
+open(r"cache\\progress\\Starting up Firefox...", "x")
 print("Initializing...")
 driver = webdriver.Firefox(desired_capabilities=Capabilities, options=options, executable_path=driverPath, firefox_profile=profiles)
 driver.set_page_load_timeout(int(ConfigParserGet(Config, 'Setting', 'BrowserTimeout')))
+open(r"cache\\progress\\Firefox ready", "x")
+# first, settle up driver, later make it able to force stop
+StopCheckForForceExit = False
+CheckForForceExit()
 
 def LoadCookie(Domain, CookiePath):
 	#	navigate (don't load)
@@ -96,6 +118,7 @@ if os.path.exists(Config['Setting']['CookiesPath']):
 	open(r"cache\\progress\\Loading cookies...", "x")
 	print("Loading cookie...")
 	LoadCookie('https://shopee.com/', Config['Setting']['CookiesPath'])
+	open(r"cache\\progress\\Cookies Loaded", "x")
 	print("Cookie Loaded!")
 
 time.sleep(1)
@@ -109,6 +132,8 @@ while True:
 		LoadErr += 1
 		time.sleep(3)
 	if LoadErr == 1:
+		if os.path.exists(r"cache\\progress\\No internet. Retrying..."):
+			open(r"cache\\progress\\No internet. Retrying...", "x")
 		print('Error has occur during web request')
 		print('Please check internet connection.')
 		print('Retrying...')
@@ -256,10 +281,12 @@ while True:
 		break
 
 # save cookie
+open(r"cache\\progress\\Saving cookies...", "x")
 pickle.dump(driver.get_cookies(), open(Config['Setting']['CookiesPath'], "wb"))
 print("Cookie saved!!")
 
-time.sleep(1)
+StopCheckForForceExit = True
+time.sleep(0.5)
 print('Exiting firefox...')
 driver.close()
 open(r"cache\\progress\\Settled", "x")

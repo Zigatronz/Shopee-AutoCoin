@@ -8,7 +8,11 @@ ProgressGUI_Show(){
 	ProgressGUI.Add("Text", "x15 y5 w304 h25 -Wrap", WinTitle)
 	ProgressGUI.SetFont("s12 c" . FGColor, "Arial")
 
-	ProgressGUI_Text := ProgressGUI.Add("Text", "x30 y40 w288 h20 Center", "Waiting for data...")
+	ProgressGUI_Text := ProgressGUI.Add("Text", "x10 y40 w270 h20 Center", "Waiting for data...")
+	ProgressGUI.SetFont("s10 w5000", "Arial")
+	ProgressGUI_StopButton := ProgressGUI.Add("Button", "x287 y35 w50 h20", "Stop")
+	ProgressGUI_StopButton.OnEvent("Click", ProgressGUI_Stop)
+	ProgressGUI.SetFont("s12 w400 c" . FGColor, "Arial")
 	ProgressGUI_Progress := ProgressGUI.Add("Progress", "x10 y65 w328 h20 Range0-100 c" . AccentColor, 0)
 
 	GuiShow_BottomRight(ProgressGUI, [348, 95])
