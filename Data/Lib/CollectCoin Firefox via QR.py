@@ -78,7 +78,7 @@ profiles = webdriver.FirefoxProfile()
 profiles.set_preference('app.update.auto', False)
 profiles.set_preference('app.update.enabled', False)
 driverPath = Config['Setting']['FirefoxDriverPath']
-#options.add_argument("--headless")
+options.add_argument("--headless")
 
 #	configure pageLoadStrategy to interactive (not complete loaded webpage; don't wait webpage to load)
 Capabilities = DesiredCapabilities.FIREFOX
