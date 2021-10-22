@@ -20,6 +20,7 @@ ProgressGUI_Show(){
 
 QRGUI_Show(){
 	global
+	local QRSize:=0
 	QRGUI := Gui("-Caption -Resize +ToolWindow +AlwaysOnTop", WinTitle)
     QRGUI.BackColor := BGColor
 
@@ -27,23 +28,29 @@ QRGUI_Show(){
 	QRGUI.Add("Text", "x15 y12 w304 h25 -Wrap", WinTitle)
 	QRGUI.SetFont("s14 c" . FGColor, "Arial")
 
-	if(FileExist("cache\QRCode.png")){
-		Loop{
-			if (FileGetSize("cache\QRCode.png") > 500){
+	Loop{
+		if(FileExist("cache\QRCode.png")){
+			try QRSize := FileGetSize("cache\QRCode.png")
+			catch
+			{
+				QRSize := 0
+			}
+			if (QRSize > 500){
+				FileCopy("cache\QRCode.png", "cache\QRCodeCache.png", 1)
+				if (FileExist("cache\QRCodeCache.png"))
+					QRGUI.Add("Picture", "x77 y60 w180 h180", "cache\QRCodeCache.png")
+				QRGUI.Add("Text", "x30 y275 w274 h100", "Please scan this QR code via Shopee App.")
+				GuiShow_BottomRight(QRGUI, [334, 453])
+			    QRGUI_is_showing := true
 				Break
 			}Else{
 				Sleep(500)
 			}
+		}else{
+			QRGUI.Destroy()
+			Break
 		}
-		FileCopy("cache\QRCode.png", "cache\QRCodeCache.png", 1)
-		if (FileExist("cache\QRCodeCache.png"))
-			QRGUI.Add("Picture", "x77 y60 w180 h180", "cache\QRCodeCache.png")
 	}
-
-	QRGUI.Add("Text", "x30 y275 w274 h100", "Please scan this QR code via Shopee App.")
-	
-	GuiShow_BottomRight(QRGUI, [334, 453])
-    QRGUI_is_showing := true
 }
 
 MainGUI_Show(LastCheck, Today, CoinEarned, FirefoxPath, DriverPath, CookiePath){
