@@ -78,7 +78,7 @@ profiles = webdriver.FirefoxProfile()
 profiles.set_preference('app.update.auto', False)
 profiles.set_preference('app.update.enabled', False)
 driverPath = Config['Setting']['FirefoxDriverPath']
-options.add_argument("--headless")
+#options.add_argument("--headless")
 
 #	configure pageLoadStrategy to interactive (not complete loaded webpage; don't wait webpage to load)
 Capabilities = DesiredCapabilities.FIREFOX
@@ -160,7 +160,13 @@ while True:
 print("Webpage loaded!")
 
 #	login stuff
-if "login" in driver.page_source:
+RequireLogin = False
+try:
+	driver.find_element_by_xpath("/html[1]/body[1]/div[1]/div/div[2]/div[1]/div/ul/li[2]")
+except:
+	RequireLogin = True
+
+if RequireLogin:
 	open(r"cache\\progress\\Processing login", "x")
 	#	Select language
 	while True:
