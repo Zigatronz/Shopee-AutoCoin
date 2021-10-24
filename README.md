@@ -6,6 +6,7 @@ Let Shopee AutoCoin run at background and notify you when to collect **Shopee Co
 3. Browse location to install and click **Extract**.
 
 ![Screenshot_01](Data/Screenshot/1.png)
+
 4. Run **Shopee AutoCoin.exe** at the extracted location.
 5. As you click **Check Now**, you're ready to go.
 
