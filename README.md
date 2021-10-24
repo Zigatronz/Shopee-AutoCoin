@@ -4,11 +4,14 @@ Let Shopee AutoCoin run at background and notify you when to collect **Shopee Co
 1. Download the installer [**here**](https://github.com/Zigatronz/Shopee-AutoCoin/releases)
 2. Run **ShopeeAutoCoin_Installer.exe** from your download folder.
 3. Browse location to install and click **Extract**.
+
 ![Screenshot_01](Data/Screenshot/1.png)
 4. Run **Shopee AutoCoin.exe** at the extracted location.
 5. As you click **Check Now**, you're ready to go.
-![Screenshot_01](Data/Screenshot/2.png)
-![Screenshot_01](Data/Screenshot/3.png)
+
+![Screenshot_02](Data/Screenshot/2.png)
+
+![Screenshot_03](Data/Screenshot/3.png)
 ## How To Update
 1. Download the latest version [**here**](https://github.com/Zigatronz/Shopee-AutoCoin/releases)
 2. Select the install location **same as the previous one**.
