@@ -29,3 +29,4 @@ Let Shopee AutoCoin run at background and notify you when to collect **Shopee Co
 - Storage: only on working directory.
 - Firefox: Run at background during coin collection.
 - Internet: https://shopee.com and https://github.com
+### - Currently devoloping v2
