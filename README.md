@@ -1,3 +1,10 @@
+# This Repo is No Longer Maintained
+This repository is no longer actively maintained. The method used is no longer effective due to increased website security measures by Shopee. Besides, time constraints prevent me from maintaining this repository.
+
+Thank you to everyone who has used this software. This repo will be archive soon.
+
+<br>
+
 # Shopee AutoCoin
 Let Shopee AutoCoin run at background and notify you when to collect **Shopee Coins Rewards**. With pressing only **one button**, Shopee AutoCoin will collect Shopee Coins Rewards **automatically** for you.
 ## How To Install
@@ -29,4 +36,4 @@ Let Shopee AutoCoin run at background and notify you when to collect **Shopee Co
 - Storage: only on working directory.
 - Firefox: Run at background during coin collection.
 - Internet: https://shopee.com and https://github.com
-### - Currently devoloping v2
+
